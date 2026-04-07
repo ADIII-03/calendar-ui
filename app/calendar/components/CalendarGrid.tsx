@@ -1,8 +1,12 @@
+"use client";
+
 import React from 'react';
-import { eachDayOfInterval, endOfMonth, endOfWeek, isSameMonth, startOfMonth, startOfWeek, addMonths, subMonths, format } from 'date-fns';
+import {
+  isSameMonth, startOfMonth, startOfWeek,
+  addMonths, subMonths, format, addDays,
+} from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import DayCell from './DayCell';
-import { DateRange } from '../hooks/useDateRange';
 
 type CalendarGridProps = {
   currentMonth: Date;
@@ -10,53 +14,74 @@ type CalendarGridProps = {
   getDayState: (date: Date) => any;
   onSelect: (date: Date) => void;
   onHover: (date: Date | null) => void;
+  onDoubleClick?: (date: Date) => void;
+  // Theme-aware colours
+  paperBg?: string;
+  paperText?: string;
+  borderColor?: string;
+  calendarData?: any[];
 };
 
-const WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-export default function CalendarGrid({ currentMonth, onMonthChange, getDayState, onSelect, onHover }: CalendarGridProps) {
-  // Calculate grid dates
-  const monthStart = startOfMonth(currentMonth);
-  const monthEnd = endOfMonth(monthStart);
-  const startDate = startOfWeek(monthStart);
-  const endDate = endOfWeek(monthEnd);
-
-  const days = eachDayOfInterval({ start: startDate, end: endDate });
+export default function CalendarGrid({
+  currentMonth, onMonthChange, getDayState, onSelect, onHover, onDoubleClick,
+  paperBg, paperText, borderColor, calendarData = [],
+}: CalendarGridProps) {
+  // Always render exactly 42 cells (6 full weeks) - prevents height jumping
+  const startDate = startOfWeek(startOfMonth(currentMonth));
+  const days = Array.from({ length: 42 }, (_, i) => addDays(startDate, i));
 
   return (
-    <div className="flex flex-col w-full p-4 sm:p-6 bg-white dark:bg-zinc-900 rounded-b-xl shadow-lg border border-zinc-100 dark:border-zinc-800" onMouseLeave={() => onHover(null)}>
+    <div
+      className="flex flex-col w-full p-4 sm:p-6 select-none"
+      style={{ background: paperBg, color: paperText }}
+      onMouseLeave={() => onHover(null)}
+    >
       {/* Month Navigation */}
-      <div className="flex items-center justify-between mb-6 px-2">
-        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 uppercase">
-          {format(currentMonth, 'MMMM yyyy')}
+      <div className="flex items-center justify-between mb-4 px-1">
+        <h2
+          className="text-xl sm:text-2xl font-black tracking-tight uppercase"
+          style={{ color: paperText }}
+        >
+          {format(currentMonth, 'MMM yyyy')}
         </h2>
-        <div className="flex gap-2">
-          <button 
+        <div className="flex gap-1">
+          <button
             onClick={() => onMonthChange(subMonths(currentMonth, 1))}
-            className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            className="p-2 rounded-full transition-colors hover:opacity-70"
+            style={{ color: paperText, border: `1px solid ${borderColor}` }}
           >
-            <ChevronLeft className="w-5 h-5 text-zinc-600 dark:text-zinc-400" />
+            <ChevronLeft className="w-4 h-4" />
           </button>
-          <button 
+          <button
             onClick={() => onMonthChange(addMonths(currentMonth, 1))}
-            className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+            className="p-2 rounded-full transition-colors hover:opacity-70"
+            style={{ color: paperText, border: `1px solid ${borderColor}` }}
           >
-            <ChevronRight className="w-5 h-5 text-zinc-600 dark:text-zinc-400" />
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      {/* WeekDays Header */}
+      {/* Divider */}
+      <div className="mb-3" style={{ borderTop: `1px solid ${borderColor}` }} />
+
+      {/* Day headers */}
       <div className="grid grid-cols-7 mb-2">
         {WEEKDAYS.map((day) => (
-          <div key={day} className="text-center text-xs font-bold text-[var(--primary)] mb-2">
+          <div
+            key={day}
+            className="text-center text-[10px] sm:text-xs font-bold py-1 tracking-widest uppercase"
+            style={{ color: 'var(--cal-primary)' }}
+          >
             {day}
           </div>
         ))}
       </div>
 
-      {/* Days Grid */}
-      <div className="grid grid-cols-7 gap-y-2 justify-items-center">
+      {/* 42 Day cells */}
+      <div className="grid grid-cols-7 gap-y-0.5 gap-x-0 justify-items-center">
         {days.map((day, i) => {
           const state = getDayState(day);
           return (
@@ -67,6 +92,9 @@ export default function CalendarGrid({ currentMonth, onMonthChange, getDayState,
               {...state}
               onSelect={onSelect}
               onHover={onHover}
+              onDoubleClick={onDoubleClick}
+              paperText={paperText}
+              calendarData={calendarData}
             />
           );
         })}

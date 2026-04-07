@@ -1,9 +1,10 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { DateRange } from '../hooks/useDateRange';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { StickyNote, Save } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 type NotesSectionProps = {
   range: DateRange;

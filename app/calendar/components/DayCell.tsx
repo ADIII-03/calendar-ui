@@ -1,75 +1,127 @@
+"use client";
+
 import React from 'react';
-import { format, isToday } from 'date-fns';
+import { format, isToday, isSameDay } from 'date-fns';
 import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils'; // Assuming shadcn initialized 'utils'
+import { cn } from '@/lib/utils';
 
 type DayCellProps = {
   date: Date;
   isCurrentMonth: boolean;
-  isStart: boolean;
-  isEnd: boolean;
-  isBetween: boolean;
-  isPreview: boolean;
-  isPreviewEnd: boolean;
-  isSelected: boolean;
+  isStart: boolean | null | undefined;
+  isEnd: boolean | null | undefined;
+  isBetween: boolean | null | undefined;
+  isPreview: boolean | null | undefined;
+  isPreviewEnd: boolean | null | undefined;
+  isSelected: boolean | null | undefined;
   onSelect: (date: Date) => void;
   onHover: (date: Date | null) => void;
+  onDoubleClick?: (date: Date) => void;
+  paperText?: string;
+  calendarData?: any[];
 };
 
-// Pure UI Component
 const DayCell = ({
-  date,
-  isCurrentMonth,
-  isStart,
-  isEnd,
-  isBetween,
-  isPreview,
-  isPreviewEnd,
-  isSelected,
-  onSelect,
-  onHover
+  date, isCurrentMonth,
+  isStart, isEnd, isBetween, isPreview, isPreviewEnd, isSelected,
+  onSelect, onHover, onDoubleClick, paperText, calendarData = [],
 }: DayCellProps) => {
   const today = isToday(date);
+  const isActive = isStart || isEnd;
+
+  // Filter and sort for consistent "lanes" across cells
+  const dayEvents = calendarData
+    .filter(item => {
+        if (item.type !== 'event') return false;
+        const d = new Date(date);
+        d.setHours(0,0,0,0);
+        const s = new Date(item.startDate);
+        s.setHours(0,0,0,0);
+        if (!item.endDate) return d.getTime() === s.getTime();
+        const e = new Date(item.endDate);
+        e.setHours(0,0,0,0);
+        return d >= s && d <= e;
+    })
+    .sort((a, b) => (a.id || a.key).localeCompare(b.id || b.key));
 
   return (
     <div
-      className={cn(
-        "relative flex h-10 w-10 sm:h-12 sm:w-12 cursor-pointer items-center justify-center font-medium transition-colors",
-        !isCurrentMonth && "text-muted-foreground/30",
-        isCurrentMonth && !isSelected && "hover:bg-zinc-100 dark:hover:bg-zinc-800",
-        isBetween && "bg-[var(--primary)]/10 text-[var(--primary)] font-bold",
-        isPreview && "bg-[var(--primary)]/5 border-y border-[var(--primary)]/20 border-dashed"
-      )}
+      className="relative flex h-12 sm:h-16 w-full cursor-pointer flex-col py-1 transition-all duration-150 select-none border-[0.5px]"
+      style={{
+        opacity: !isCurrentMonth ? 0.25 : 1,
+        background: isBetween
+          ? 'var(--cal-primary)15'
+          : isPreview
+          ? 'var(--cal-primary)10'
+          : 'transparent',
+        borderColor: 'var(--cal-border)',
+        minWidth: 0,
+      }}
       onClick={() => onSelect(date)}
+      onDoubleClick={() => onDoubleClick?.(date)}
       onMouseEnter={() => onHover(date)}
-      // Support keyboard nav via simple tab selection natively handled later
     >
-      {/* Background shapes for Start/End */}
-      {(isStart || isEnd || isPreviewEnd) && (
+      {/* Date header line */}
+      <div className="flex justify-between items-start mb-1 px-1">
+        <span
+          className={cn(
+            'relative z-10 w-5 h-5 flex items-center justify-center rounded-full text-[10px] sm:text-[11px] font-bold transition-colors',
+            today && !isActive && 'bg-[var(--cal-primary)] text-white',
+            isActive && 'bg-[var(--cal-primary)] text-white'
+          )}
+          style={{ 
+            color: (isActive || (today && !isActive)) ? '#fff' : paperText || 'inherit' 
+          }}
+        >
+          {format(date, 'd')}
+        </span>
+      </div>
+
+      {/* Events List (Continuous Ranges) */}
+      <div className="flex-1 space-y-0.5 overflow-hidden">
+        {dayEvents.slice(0, 3).map((ev, idx) => {
+          const isStart = isSameDay(date, new Date(ev.startDate));
+          const isEnd = ev.endDate ? isSameDay(date, new Date(ev.endDate)) : true;
+          // Standard calendars only show text on the first day
+          const showText = isStart;
+
+          return (
+            <div
+              key={(ev.id || ev.key) + idx}
+              className={cn(
+                "text-[8px] sm:text-[9px] leading-tight flex items-center h-4.5 sm:h-5 transition-all text-white shadow-sm font-bold z-[5]",
+                isStart ? "rounded-l-md ml-0.5 pl-1.5" : "-ml-[1px]",
+                isEnd ? "rounded-r-md mr-0.5" : "-mr-[1px]"
+              )}
+              style={{ 
+                background: 'var(--cal-primary)',
+                opacity: 0.95
+              }}
+              title={ev.text}
+            >
+              {showText && (
+                <>
+                  <div className="w-1 h-1 bg-white rounded-full shrink-0 mr-1.5" />
+                  <span className="truncate pr-1.5 whitespace-nowrap overflow-hidden">{ev.text}</span>
+                </>
+              )}
+            </div>
+          );
+        })}
+        {dayEvents.length > 3 && (
+            <div className="text-[7px] sm:text-[8px] font-black opacity-40 px-1.5">
+                + {dayEvents.length - 3} MORE
+            </div>
+        )}
+      </div>
+
+      {/* Active selection markers */}
+      {isActive && (
         <motion.div
-           layoutId={isStart ? "start-bg" : isEnd ? "end-bg" : undefined}
-           className={cn(
-            "absolute inset-0 m-1 rounded-full",
-             (isStart || isEnd) && "bg-[var(--primary)] shadow-md",
-             isPreviewEnd && "border-2 border-dashed border-[var(--primary)]"
-           )}
-           transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            layoutId={isStart ? 'range-start' : isEnd ? 'range-end' : undefined}
+            className="absolute inset-0 border-2 border-[var(--cal-primary)] pointer-events-none rounded-sm z-[2]"
         />
       )}
-
-      {/* Today Pulse Indicator */}
-      {today && !isSelected && (
-        <span className="absolute bottom-1 h-1 w-1 rounded-full bg-[var(--accent)] animate-pulse" />
-      )}
-
-      {/* Date text (bring to front) */}
-      <span className={cn(
-        "relative z-10",
-        (isStart || isEnd) && "text-white",
-        today && isSelected && "text-white"
-      )}>
-        {format(date, 'd')}
-      </span>
     </div>
   );
 };
