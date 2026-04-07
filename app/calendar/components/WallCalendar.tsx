@@ -24,14 +24,14 @@ const flipVariants = {
     opacity: 1,
     y: 0,
     transformOrigin: 'top center',
-    transition: { duration: 0.52, ease: [0.22, 0.6, 0.36, 1] },
+    transition: { duration: 0.52, ease: [0.22, 0.6, 0.36, 1] as const },
   },
   exit: (dir: number) => ({
     rotateX: dir > 0 ? 90 : -90,
     opacity: 0,
     y: dir > 0 ? 12 : -12,
     transformOrigin: 'bottom center',
-    transition: { duration: 0.4, ease: [0.64, 0, 0.78, 0] },
+    transition: { duration: 0.4, ease: [0.64, 0, 0.78, 0] as const },
   }),
 };
 
@@ -441,7 +441,7 @@ export default function WallCalendar() {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     onClick={() => setIsNotesModalOpen(true)}
-                    className="btn btn-lg rounded-full text-white px-8 font-black shadow-2xl tracking-tighter hover:scale-105 active:scale-95"
+                    className="flex items-center justify-center rounded-full text-white px-8 py-4 font-black shadow-2xl tracking-tighter hover:scale-105 active:scale-95 transition-all outline-none"
                     style={{
                       background: activeTheme.calPrimary,
                       border: 'none',
