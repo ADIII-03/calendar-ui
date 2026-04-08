@@ -49,16 +49,20 @@ export default function CalendarGrid({
         <div className="flex gap-1">
           <button
             onClick={() => onMonthChange(subMonths(currentMonth, 1))}
-            className="p-2 rounded-full transition-colors hover:opacity-70"
+            className="p-2 rounded-full transition-colors hover:opacity-70 flex items-center gap-1.5"
             style={{ color: paperText, border: `1px solid ${borderColor}` }}
+            title="Previous Month (Left Arrow)"
           >
             <ChevronLeft className="w-4 h-4" />
+            <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[9px] font-sans font-black bg-black/5 dark:bg-white/5 rounded border border-current opacity-50">←</kbd>
           </button>
           <button
             onClick={() => onMonthChange(addMonths(currentMonth, 1))}
-            className="p-2 rounded-full transition-colors hover:opacity-70"
+            className="p-2 rounded-full transition-colors hover:opacity-70 flex items-center gap-1.5"
             style={{ color: paperText, border: `1px solid ${borderColor}` }}
+            title="Next Month (Right Arrow)"
           >
+            <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[9px] font-sans font-black bg-black/5 dark:bg-white/5 rounded border border-current opacity-50">→</kbd>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>

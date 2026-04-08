@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useDateRange } from '../hooks/useDateRange';
+import { format, isToday, isSameDay, addMonths, subMonths } from 'date-fns';
 import Image from 'next/image';
 import { useCalendarTheme, CalendarTheme } from '../hooks/useCalendarTheme';
 import CalendarGrid from './CalendarGrid';
@@ -10,7 +11,6 @@ import NotesHistory from './NotesHistory';
 import ViewEventsModal from './ViewEventsModal';
 import { motion, useAnimation, AnimatePresence } from 'framer-motion';
 import { BookOpen, PlusCircle } from 'lucide-react';
-import { isSameDay } from 'date-fns';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 const flipVariants = {
@@ -373,6 +373,32 @@ export default function WallCalendar() {
     };
   }, [triggerBreeze]);
 
+  // ── Keyboard Navigation ───────────────────────────────────────────────────
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is typing in a text field
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+        return;
+      }
+
+      if (e.key === 'ArrowLeft') {
+        changeMonth(subMonths(currentMonth, 1));
+      } else if (e.key === 'ArrowRight') {
+        changeMonth(addMonths(currentMonth, 1));
+      } else if (e.key.toLowerCase() === 't') {
+        changeMonth(new Date());
+      } else if (e.key === 'Escape') {
+        setIsNotesModalOpen(false);
+        setIsHistoryOpen(false);
+        setIsViewModalOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentMonth]);
+
   const changeMonth = (newDate: Date) => {
     setFlipDirection(newDate > currentMonth ? 1 : -1);
     setCurrentMonth(newDate);
@@ -506,9 +532,24 @@ export default function WallCalendar() {
               <div className="absolute inset-0 bg-black/25 mix-blend-overlay opacity-40 pointer-events-none"
                 style={{ backgroundImage: 'url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\'><filter id=\'n\'><feTurbulence type=\'fractalNoise\' baseFrequency=\'0.8\'/></filter><rect width=\'100\' height=\'100\' filter=\'url(%23n)\'/></svg>")' }} />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
-                <p className="text-white/60 text-[10px] md:text-xs font-black tracking-widest uppercase mb-1 md:mb-2">{heroMonth}</p>
-                <h1 className="text-white text-3xl md:text-5xl font-black italic tracking-tighter leading-none">TUF CALENDAR</h1>
+              <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10 flex items-end justify-between">
+                <div>
+                  <p className="text-white/60 text-[10px] md:text-xs font-black tracking-widest uppercase mb-1 md:mb-2">{heroMonth}</p>
+                  <h1 className="text-white text-3xl md:text-5xl font-black italic tracking-tighter leading-none">TUF CALENDAR</h1>
+                </div>
+                
+                {/* Back to Today Button */}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => changeMonth(new Date())}
+                  className="mb-1 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all shadow-2xl"
+                  title="Go to Today (T)"
+                >
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Today
+                  <kbd className="hidden sm:inline-block ml-1 px-1.5 py-0.5 text-[8px] font-sans font-black bg-black/20 rounded border border-white/20 opacity-60">T</kbd>
+                </motion.button>
               </div>
             </div>
 

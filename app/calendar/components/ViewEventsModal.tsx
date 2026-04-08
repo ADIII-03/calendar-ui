@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { format } from 'date-fns';
-import { X, Calendar, MessageSquare, Info, ChevronRight } from 'lucide-react';
+import { X, Calendar, MessageSquare, Info, ChevronRight, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type ViewEventsModalProps = {
@@ -22,6 +22,29 @@ export default function ViewEventsModal({ isOpen, onClose, date, dayEvents }: Vi
     if (next.has(id)) next.delete(id);
     else next.add(id);
     setExpandedItems(next);
+  };
+
+  const handleDeleteItem = (item: any) => {
+    const key = item.key || `calendar_notes_${format(new Date(item.startDate), 'yyyy-MM-dd')}`;
+    const raw = localStorage.getItem(key);
+    if (!raw) return;
+
+    try {
+      const parsed = JSON.parse(raw);
+      const entries = Array.isArray(parsed) ? parsed : [parsed];
+      const updated = entries.filter((i: any) => (i.id || i.key) !== (item.id || item.key));
+
+      if (updated.length === 0) {
+        localStorage.removeItem(key);
+      } else {
+        localStorage.setItem(key, JSON.stringify(updated));
+      }
+
+      // Dispatch sync event
+      window.dispatchEvent(new CustomEvent('calendar_data_updated'));
+      
+      // If no events left for this day, close or refresh will happen via sync
+    } catch (e) {}
   };
 
   return (
@@ -88,9 +111,11 @@ export default function ViewEventsModal({ isOpen, onClose, date, dayEvents }: Vi
                 {/* Premium Cross Button */}
                 <button 
                   onClick={onClose} 
-                  className="absolute top-8 right-8 w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all active:scale-95 border border-white/20 text-white group/btn"
+                  className="absolute top-8 right-8 h-10 px-3 flex items-center gap-2 rounded-full bg-white/10 hover:bg-white/20 transition-all active:scale-95 border border-white/20 text-white group/btn"
+                  title="Close (ESC)"
                 >
-                  <X className="w-5 h-5 transition-transform group-hover/btn:rotate-90" />
+                  <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[8px] font-sans font-black bg-black/20 rounded border border-white/20 opacity-60 uppercase group-hover/btn:opacity-100 transition-opacity">Esc</kbd>
+                  <X className="w-5 h-5 transition-transform group-hover/btn:rotate-90 opacity-80 group-hover/btn:opacity-100" />
                 </button>
               </div>
 
@@ -141,6 +166,13 @@ export default function ViewEventsModal({ isOpen, onClose, date, dayEvents }: Vi
                                 </button>
                             )}
                           </div>
+                          
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDeleteItem(item); }}
+                            className="p-2.5 rounded-xl text-red-500 bg-red-500/0 hover:bg-red-500/10 transition-all opacity-0 group-hover:opacity-100 active:scale-90"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
                         </motion.div>
                       );
                     })}

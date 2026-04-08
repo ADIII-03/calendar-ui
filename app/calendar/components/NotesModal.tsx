@@ -134,8 +134,9 @@ export default function NotesModal({ isOpen, onClose, range }: NotesModalProps) 
                     <p className="font-bold opacity-40 text-[9px] tracking-widest uppercase">{label}</p>
                   </div>
                 </div>
-                <button onClick={onClose} className="p-2 hover:bg-black/5 rounded-full transition-colors active:scale-95">
-                  <X className="w-5 h-5" />
+                <button onClick={onClose} className="p-2 hover:bg-black/5 rounded-full transition-colors active:scale-95 flex items-center gap-2 group/btn" title="Close (ESC)">
+                  <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[8px] font-sans font-black bg-black/10 rounded border border-current opacity-40 uppercase group-hover/btn:opacity-80 transition-opacity">Esc</kbd>
+                  <X className="w-5 h-5 opacity-60 group-hover/btn:opacity-100" />
                 </button>
               </div>
 

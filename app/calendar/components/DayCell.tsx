@@ -60,7 +60,7 @@ const DayCell = ({
 
   return (
     <div
-      className="relative flex h-11 sm:h-13 w-full cursor-pointer flex-col py-1 transition-all duration-150 select-none border-[0.5px]"
+      className="relative flex h-14 sm:h-20 w-full cursor-pointer flex-col py-1 transition-all duration-150 select-none border-[0.5px]"
       style={{
         opacity: !isCurrentMonth ? 0.25 : 1,
         background: isBetween
@@ -79,12 +79,12 @@ const DayCell = ({
       <div className="flex justify-between items-start mb-1 px-1">
         <span
           className={cn(
-            'relative z-10 w-5 h-5 flex items-center justify-center rounded-full text-[10px] sm:text-[11px] font-bold transition-colors',
-            today && !isActive && 'bg-[var(--cal-primary)] text-white',
-            isActive && 'bg-[var(--cal-primary)] text-white'
+            'relative z-10 w-6 h-6 flex items-center justify-center rounded-full text-[10px] sm:text-[12px] font-black transition-all',
+            today && !isActive && 'ring-2 ring-emerald-500 text-emerald-600 shadow-[0_0_10px_rgba(16,185,129,0.3)]',
+            isActive && 'bg-[var(--cal-primary)] text-white shadow-lg scale-110'
           )}
           style={{
-            color: (isActive || (today && !isActive)) ? '#fff' : paperText || 'inherit'
+            color: (isActive) ? '#fff' : (today && !isActive) ? '#10b981' : paperText || 'inherit'
           }}
         >
           {format(date, 'd')}
@@ -103,22 +103,21 @@ const DayCell = ({
             <div
               key={(ev.id || ev.key) + idx}
               className={cn(
-                "text-[8px] sm:text-[9px] leading-tight flex items-center h-4.5 sm:h-5 transition-all text-white shadow-sm font-bold z-[5]",
-                isStart ? "rounded-l-md ml-0.5 pl-1.5" : "-ml-[1px]",
-                isEnd ? "rounded-r-md mr-0.5" : "-mr-[1px]"
+                "text-[8px] sm:text-[10px] leading-none flex items-center justify-center h-5 sm:h-6 transition-all text-white shadow-sm font-black z-[5] px-1",
+                isStart ? "rounded-l-xl ml-1" : "-ml-[1px]",
+                isEnd ? "rounded-r-xl mr-1" : "-mr-[1px]"
               )}
               style={{
                 background: 'var(--cal-primary)',
-                opacity: 0.95
+                opacity: 0.95,
+                borderLeft: !isStart ? 'none' : undefined,
+                borderRight: !isEnd ? 'none' : undefined,
               }}
               title={ev.text}
             >
-              {showText && (
-                <>
-                  <div className="w-1 h-1 bg-white rounded-full shrink-0 mr-1.5" />
-                  <span className="truncate pr-1.5 whitespace-nowrap overflow-hidden">{ev.text}</span>
-                </>
-              )}
+              <span className="truncate whitespace-nowrap overflow-hidden">
+                {ev.text}
+              </span>
             </div>
           );
         })}

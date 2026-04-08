@@ -32,10 +32,28 @@ const itemVariants = {
 export default function NotesHistory({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [notes, setNotes] = useState<SavedNote[]>([]);
   const [search, setSearch] = useState("");
+  const [visibleCount, setVisibleCount] = useState(20);
+  const [isNotesLoaded, setIsNotesLoaded] = useState(false);
 
   useEffect(() => {
-    if (isOpen) loadNotes();
+    if (isOpen) {
+      // Delay loading to allow modal to animate smoothly
+      const timer = setTimeout(() => {
+        loadNotes();
+        setIsNotesLoaded(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    } else {
+      setIsNotesLoaded(false);
+      setNotes([]);
+      setSearch("");
+      setVisibleCount(20);
+    }
   }, [isOpen]);
+
+  useEffect(() => {
+    setVisibleCount(20);
+  }, [search]);
 
   useEffect(() => {
     window.addEventListener('calendar_data_updated', loadNotes);
@@ -94,6 +112,8 @@ export default function NotesHistory({ isOpen, onClose }: { isOpen: boolean; onC
     n.text.toLowerCase().includes(search.toLowerCase()) || 
     n.label.toLowerCase().includes(search.toLowerCase())
   );
+  
+  const displayedNotes = filteredNotes.slice(0, visibleCount);
 
   return (
     <AnimatePresence>
@@ -133,8 +153,9 @@ export default function NotesHistory({ isOpen, onClose }: { isOpen: boolean; onC
                             <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">All saved activities</p>
                         </div>
                      </div>
-                     <button onClick={onClose} className="p-3 hover:bg-black/10 rounded-full transition-all active:scale-90">
-                        <X className="w-6 h-6 opacity-40 hover:opacity-100" />
+                     <button onClick={onClose} className="p-2 hover:bg-black/10 rounded-full transition-all active:scale-90 flex items-center gap-2 group/btn" title="Close (ESC)">
+                        <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[8px] font-sans font-black bg-black/10 rounded border border-current opacity-40 uppercase group-hover/btn:opacity-80 transition-opacity">Esc</kbd>
+                        <X className="w-5 h-5 opacity-40 group-hover/btn:opacity-100" />
                      </button>
                 </div>
 
@@ -153,7 +174,12 @@ export default function NotesHistory({ isOpen, onClose }: { isOpen: boolean; onC
 
             {/* Notes List with Custom Scrollbar */}
             <div className="flex-1 overflow-y-auto p-8 pt-6 space-y-6 custom-scrollbar scroll-smooth">
-              {filteredNotes.length === 0 ? (
+              {!isNotesLoaded ? (
+                <div className="flex flex-col items-center justify-center h-full gap-5 opacity-30 text-center py-20">
+                   <div className="w-8 h-8 rounded-full border-t-2 border-[var(--cal-primary)] animate-spin" />
+                   <p className="text-[10px] font-black uppercase tracking-widest animate-pulse">Loading Journal...</p>
+                </div>
+              ) : filteredNotes.length === 0 ? (
                 <motion.div 
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -172,7 +198,7 @@ export default function NotesHistory({ isOpen, onClose }: { isOpen: boolean; onC
                     animate="animate"
                     className="space-y-4"
                 >
-                  {filteredNotes.map((note) => (
+                  {displayedNotes.map((note) => (
                     <motion.div
                       key={note.id}
                       variants={itemVariants}
@@ -222,6 +248,17 @@ export default function NotesHistory({ isOpen, onClose }: { isOpen: boolean; onC
                         </div>
                     </motion.div>
                   ))}
+                  
+                  {visibleCount < filteredNotes.length && (
+                      <motion.button 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        onClick={() => setVisibleCount(v => v + 20)}
+                        className="w-full py-4 mt-6 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-all border border-dashed border-current rounded-2xl active:scale-95"
+                      >
+                         Load {Math.min(20, filteredNotes.length - visibleCount)} More Notes ({filteredNotes.length - visibleCount} remaining)
+                      </motion.button>
+                  )}
                 </motion.div>
               )}
             </div>
