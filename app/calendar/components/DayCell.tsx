@@ -60,7 +60,7 @@ const DayCell = ({
 
   return (
     <div
-      className="relative flex h-14 sm:h-20 w-full cursor-pointer flex-col py-1 transition-all duration-150 select-none border-[0.5px]"
+      className="relative flex h-11 sm:h-16 w-full cursor-pointer flex-col py-0.5 transition-all duration-150 select-none border-[0.5px]"
       style={{
         opacity: !isCurrentMonth ? 0.25 : 1,
         background: isBetween

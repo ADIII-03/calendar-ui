@@ -108,11 +108,11 @@ export default function NotesHistory({ isOpen, onClose }: { isOpen: boolean; onC
     }
   };
 
-  const filteredNotes = notes.filter(n => 
-    n.text.toLowerCase().includes(search.toLowerCase()) || 
+  const filteredNotes = notes.filter(n =>
+    n.text.toLowerCase().includes(search.toLowerCase()) ||
     n.label.toLowerCase().includes(search.toLowerCase())
   );
-  
+
   const displayedNotes = filteredNotes.slice(0, visibleCount);
 
   return (
@@ -135,55 +135,55 @@ export default function NotesHistory({ isOpen, onClose }: { isOpen: boolean; onC
             exit={{ x: "100%" }}
             transition={{ type: "spring", stiffness: 220, damping: 28 }}
             className="fixed top-0 right-0 h-full w-full max-w-md shadow-[0_0_80px_rgba(0,0,0,0.4)] z-[101] flex flex-col border-l overflow-hidden"
-            style={{ 
-              background: 'var(--cal-paper)', 
-              color: 'var(--cal-paper-text)', 
-              borderColor: 'var(--cal-border)' 
+            style={{
+              background: 'var(--cal-paper)',
+              color: 'var(--cal-paper-text)',
+              borderColor: 'var(--cal-border)'
             }}
           >
             {/* Header Visual */}
             <div className="relative px-8 py-10 bg-black/5" style={{ borderBottom: '1px solid var(--cal-border)' }}>
-                <div className="flex items-center justify-between mb-8">
-                     <div className="flex items-center gap-4">
-                        <div className="p-3 rounded-2xl bg-[var(--cal-primary)] flex items-center justify-center shadow-lg">
-                            <NotebookText className="w-6 h-6 text-white" />
-                        </div>
-                        <div>
-                            <h2 className="text-3xl font-black tracking-tighter italic uppercase leading-tight">Journal</h2>
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">All saved activities</p>
-                        </div>
-                     </div>
-                     <button onClick={onClose} className="p-2 hover:bg-black/10 rounded-full transition-all active:scale-90 flex items-center gap-2 group/btn" title="Close (ESC)">
-                        <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[8px] font-sans font-black bg-black/10 rounded border border-current opacity-40 uppercase group-hover/btn:opacity-80 transition-opacity">Esc</kbd>
-                        <X className="w-5 h-5 opacity-40 group-hover/btn:opacity-100" />
-                     </button>
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-2xl bg-[var(--cal-primary)] flex items-center justify-center shadow-lg">
+                    <NotebookText className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-black tracking-tighter italic uppercase leading-tight">Journal</h2>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">All saved activities</p>
+                  </div>
                 </div>
+                <button onClick={onClose} className="p-2 hover:bg-black/10 rounded-full transition-all active:scale-90 flex items-center gap-2 group/btn" title="Close (ESC)">
+                  <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[8px] font-sans font-black bg-black/10 rounded border border-current opacity-40 uppercase group-hover/btn:opacity-80 transition-opacity">Esc</kbd>
+                  <X className="w-5 h-5 opacity-40 group-hover/btn:opacity-100" />
+                </button>
+              </div>
 
-                {/* Interactive Search */}
-                <div className="relative group">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-30 group-focus-within:opacity-80 transition-all group-focus-within:text-[var(--cal-primary)]" />
-                    <input 
-                        type="text" 
-                        placeholder="Search your notes..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="w-full pl-12 pr-4 py-4 rounded-2xl bg-black/5 focus:bg-black/10 transition-all outline-none border border-transparent focus:border-[var(--cal-primary)]/30 font-bold text-sm"
-                    />
-                </div>
+              {/* Interactive Search */}
+              <div className="relative group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 opacity-30 group-focus-within:opacity-80 transition-all group-focus-within:text-[var(--cal-primary)]" />
+                <input
+                  type="text"
+                  placeholder="Search your notes..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-12 pr-4 py-4 rounded-2xl bg-black/5 focus:bg-black/10 transition-all outline-none border border-transparent focus:border-[var(--cal-primary)]/30 font-bold text-sm"
+                />
+              </div>
             </div>
 
             {/* Notes List with Custom Scrollbar */}
             <div className="flex-1 overflow-y-auto p-8 pt-6 space-y-6 custom-scrollbar scroll-smooth">
               {!isNotesLoaded ? (
                 <div className="flex flex-col items-center justify-center h-full gap-5 opacity-30 text-center py-20">
-                   <div className="w-8 h-8 rounded-full border-t-2 border-[var(--cal-primary)] animate-spin" />
-                   <p className="text-[10px] font-black uppercase tracking-widest animate-pulse">Loading Journal...</p>
+                  <div className="w-8 h-8 rounded-full border-t-2 border-[var(--cal-primary)] animate-spin" />
+                  <p className="text-[10px] font-black uppercase tracking-widest animate-pulse">Loading Journal...</p>
                 </div>
               ) : filteredNotes.length === 0 ? (
-                <motion.div 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="flex flex-col items-center justify-center h-full gap-5 opacity-20 text-center py-20"
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex flex-col items-center justify-center h-full gap-5 opacity-20 text-center py-20"
                 >
                   <Inbox className="w-16 h-16" />
                   <div className="space-y-1">
@@ -192,11 +192,11 @@ export default function NotesHistory({ isOpen, onClose }: { isOpen: boolean; onC
                   </div>
                 </motion.div>
               ) : (
-                <motion.div 
-                    variants={listVariants}
-                    initial="initial"
-                    animate="animate"
-                    className="space-y-4"
+                <motion.div
+                  variants={listVariants}
+                  initial="initial"
+                  animate="animate"
+                  className="space-y-4"
                 >
                   {displayedNotes.map((note) => (
                     <motion.div
@@ -205,59 +205,61 @@ export default function NotesHistory({ isOpen, onClose }: { isOpen: boolean; onC
                       className="group relative flex flex-col p-6 rounded-[2.5rem] bg-black/5 border transition-all hover:bg-black-[8%] border-transparent hover:border-black/5"
                       style={{ borderColor: 'var(--cal-border)' }}
                     >
-                        {/* Type Bar Accent */}
-                        <div 
-                           className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-1/2 rounded-r-full transition-all group-hover:h-2/3" 
-                           style={{ background: note.type === 'event' ? 'var(--cal-primary)' : 'rgba(0,0,0,0.1)' }}
-                        />
+                      {/* Type Bar Accent */}
+                      <div
+                        className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-1/2 rounded-r-full transition-all group-hover:h-2/3"
+                        style={{ background: note.type === 'event' ? 'var(--cal-primary)' : 'rgba(0,0,0,0.1)' }}
+                      />
 
-                        {/* Card Header */}
-                        <div className="flex items-center justify-between mb-3 pl-2">
-                          <div className="flex items-center gap-2">
-                             <div className={`p-1.5 rounded-lg ${note.type === 'event' ? 'bg-[var(--cal-primary)]/10 text-[var(--cal-primary)]' : 'bg-black/5 opacity-40'}`}>
-                                <CalendarDays className="w-3.5 h-3.5" />
-                             </div>
-                             <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
-                                {note.label}
-                             </span>
+                      {/* Card Header */}
+                      <div className="flex items-center justify-between mb-3 pl-2">
+                        <div className="flex items-center gap-2">
+                          <div className={`p-1.5 rounded-lg ${note.type === 'event' ? 'bg-[var(--cal-primary)]/10 text-[var(--cal-primary)]' : 'bg-black/5 opacity-40'}`}>
+                            <CalendarDays className="w-3.5 h-3.5" />
                           </div>
+                          <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
+                            {note.label}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
                           <span className={`text-[8px] font-black tracking-widest uppercase px-3 py-1 rounded-full border ${note.type === 'event' ? 'bg-[var(--cal-primary)] text-white border-[var(--cal-primary)]' : 'bg-transparent opacity-30 border-current'}`}>
                             {note.type}
                           </span>
-                        </div>
-
-                        {/* Content */}
-                        <div className="pl-2">
-                            <p className={`text-lg leading-[1.4] mb-4 whitespace-pre-wrap line-clamp-5 ${note.type === 'event' ? 'font-black tracking-tighter text-base-content' : 'italic opacity-60'}`}>
-                                {note.text}
-                            </p>
-                        </div>
-
-                        {/* Action Bar */}
-                        <div className="flex items-center justify-between mt-auto pt-4 border-t border-black/5 pl-2">
-                          <span className="text-[10px] font-bold opacity-20 uppercase tracking-widest">
-                            {format(new Date(note.createdAt), "MMM d, yyyy")}
-                          </span>
                           <button
-                            onClick={() => handleDelete(note.key, note.id)}
-                            className="flex items-center gap-2 py-2 px-5 text-[10px] font-black uppercase italic tracking-tighter text-red-500 bg-red-500/0 hover:bg-red-500/10 rounded-2xl transition-all opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0"
+                            onClick={(e) => { e.stopPropagation(); handleDelete(note.key, note.id); }}
+                            className="p-1.5 ml-1 text-red-500/40 hover:text-red-500 hover:bg-red-500/10 rounded-full transition-all"
+                            title="Delete Entry"
                           >
-                            <Trash2 className="w-4 h-4" />
-                            Delete Entry
+                            <X className="w-4 h-4" />
                           </button>
                         </div>
+                      </div>
+
+                      {/* Content */}
+                      <div className="pl-2">
+                        <p className={`text-lg leading-[1.4] mb-4 whitespace-pre-wrap line-clamp-5 ${note.type === 'event' ? 'font-black tracking-tighter text-base-content' : 'italic opacity-60'}`}>
+                          {note.text}
+                        </p>
+                      </div>
+
+                      {/* Action Bar */}
+                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-black/5 pl-2">
+                        <span className="text-[10px] font-bold opacity-30 uppercase tracking-widest">
+                          {format(new Date(note.createdAt), "MMM d, yyyy")}
+                        </span>
+                      </div>
                     </motion.div>
                   ))}
-                  
+
                   {visibleCount < filteredNotes.length && (
-                      <motion.button 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        onClick={() => setVisibleCount(v => v + 20)}
-                        className="w-full py-4 mt-6 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-all border border-dashed border-current rounded-2xl active:scale-95"
-                      >
-                         Load {Math.min(20, filteredNotes.length - visibleCount)} More Notes ({filteredNotes.length - visibleCount} remaining)
-                      </motion.button>
+                    <motion.button
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      onClick={() => setVisibleCount(v => v + 20)}
+                      className="w-full py-4 mt-6 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-all border border-dashed border-current rounded-2xl active:scale-95"
+                    >
+                      Load {Math.min(20, filteredNotes.length - visibleCount)} More Notes ({filteredNotes.length - visibleCount} remaining)
+                    </motion.button>
                   )}
                 </motion.div>
               )}
@@ -265,9 +267,9 @@ export default function NotesHistory({ isOpen, onClose }: { isOpen: boolean; onC
 
             {/* Premium Sticky Footer */}
             <div className="p-8 border-t bg-black/[0.02] flex items-center justify-center" style={{ borderColor: 'var(--cal-border)' }}>
-                 <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30 text-center">
-                    TUF Wall Calendar • Journal
-                 </p>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30 text-center">
+                TUF Wall Calendar • Journal
+              </p>
             </div>
           </motion.div>
         </>

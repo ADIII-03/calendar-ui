@@ -321,23 +321,23 @@ export default function WallCalendar() {
     await new Promise(r => setTimeout(r, 400));
 
     try {
-      // Rapid "jiggle" sequence
+      // Very subtle "jiggle" sequence so it's not distracting
       await calendarControls.start({
-        rotate: -2.5,
-        x: -2,
-        transition: { duration: 0.15, ease: 'easeOut' }
+        rotate: -0.8,
+        x: -1,
+        transition: { duration: 0.2, ease: 'easeOut' }
       });
       await calendarControls.start({
-        rotate: 2,
-        x: 1,
-        transition: { duration: 0.12, ease: 'easeInOut' }
+        rotate: 0.5,
+        x: 0.5,
+        transition: { duration: 0.15, ease: 'easeInOut' }
       });
       await calendarControls.start({
-        rotate: -1.2,
-        transition: { duration: 0.1, ease: 'easeInOut' }
+        rotate: -0.3,
+        transition: { duration: 0.15, ease: 'easeInOut' }
       });
       await calendarControls.start({
-        rotate: 0.6,
+        rotate: 0.1,
         transition: { duration: 0.3, ease: 'easeOut' }
       });
       await calendarControls.start({
@@ -499,7 +499,7 @@ export default function WallCalendar() {
 
       {/* Main Calendar Space (Centered & Scroll-free) */}
       <div className="flex-1 w-full flex items-center justify-center p-2 sm:p-4 md:p-6 overflow-hidden relative z-10">
-        <div className="relative w-full max-w-4xl scale-[0.98] sm:scale-100 transition-transform duration-500">
+        <div className="relative w-full max-w-3xl scale-[0.98] sm:scale-100 transition-transform duration-500">
           <Nail />
 
           <motion.div
@@ -515,8 +515,8 @@ export default function WallCalendar() {
               color: 'var(--cal-paper-text)',
             }}
           >
-            {/* Main Visual Panel (Larger on mobile) */}
-            <div className="md:w-5/12 h-52 md:h-auto md:min-h-[480px] relative overflow-hidden bg-black flex-shrink-0">
+            {/* Main Visual Panel */}
+            <div className="md:w-5/12 h-36 md:h-auto relative overflow-hidden bg-black flex-shrink-0">
               <AnimatePresence mode="wait">
                 <motion.img
                   key={heroImage}
@@ -537,19 +537,6 @@ export default function WallCalendar() {
                   <p className="text-white/60 text-[10px] md:text-xs font-black tracking-widest uppercase mb-1 md:mb-2">{heroMonth}</p>
                   <h1 className="text-white text-3xl md:text-5xl font-black italic tracking-tighter leading-none">TUF CALENDAR</h1>
                 </div>
-                
-                {/* Back to Today Button */}
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => changeMonth(new Date())}
-                  className="mb-1 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all shadow-2xl"
-                  title="Go to Today (T)"
-                >
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  Today
-                  <kbd className="hidden sm:inline-block ml-1 px-1.5 py-0.5 text-[8px] font-sans font-black bg-black/20 rounded border border-white/20 opacity-60">T</kbd>
-                </motion.button>
               </div>
             </div>
 
@@ -583,7 +570,7 @@ export default function WallCalendar() {
                 </AnimatePresence>
               </div>
 
-              <div className="h-16 md:h-20 flex items-center justify-center p-4" style={{ borderTop: `1px solid var(--cal-border)` }}>
+              <div className="h-12 md:h-14 flex items-center justify-center px-4" style={{ borderTop: `1px solid var(--cal-border)` }}>
                 <AnimatePresence>
                   {range.start && (
                     <motion.button
