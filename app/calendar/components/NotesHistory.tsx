@@ -37,6 +37,11 @@ export default function NotesHistory({ isOpen, onClose }: { isOpen: boolean; onC
     if (isOpen) loadNotes();
   }, [isOpen]);
 
+  useEffect(() => {
+    window.addEventListener('calendar_data_updated', loadNotes);
+    return () => window.removeEventListener('calendar_data_updated', loadNotes);
+  }, []);
+
   const loadNotes = () => {
     const loaded: SavedNote[] = [];
     for (let i = 0; i < localStorage.length; i++) {

@@ -1,28 +1,21 @@
-# 🗓️ High-Fidelity 3D Interactive Wall Calendar
+# 🗓️ Interactive Seasonal Wall Calendar
 
-A premium, physics-based "Hanging Wall" calendar application built with **Next.js 15**, **Tailwind CSS v4**, and **Framer Motion**. This project simulates the tactile feel of a physical calendar while providing powerful digital organization tools.
+A premium, state-of-the-art **Next.js 16** "Wall Art" calendar application. This project blends a physical wall-hanging aesthetic with a smart, automated seasonal engine that transforms the entire environment based on the current month.
 
 ---
 
 ## 🌟 Overview
-This component was designed as a functional piece of **Wall Art**. It goes beyond a simple date grid by incorporating a 3D environment, realistic "fluttering" physics, and a deep theme engine that changes the entire room's atmosphere.
+This application is more than a utility—it's an interactive 3D environment. It features a high-fidelity "hanging" calendar with realistic physics, dynamic weather particles, and a **Seasonal Window Scenery** system that visualizes the world outside your virtual room.
 
 ---
 
-## 🛠 Project Structure & Models
+## 🛠 Project Structure & Architecture
 
 ### 📁 Directory Layout
 ```text
 intern/
 ├── app/
 │   ├── calendar/
-│   │   ├── components/       # UI Components (Grid, Modals, History)
-│   │   ├── hooks/            # Custom Logic (Date Math, Theme Engine)
-│   │   └── page.tsx          # Main Entry Point
-│   ├── globals.css           # Design Tokens & Theme Variables
-│   └── layout.tsx            # No-Scroll Viewport Base
-├── lib/
-│   └── utils.ts              # Tailwind/Class Merging Utilities
 └── public/                   # High-Definition Theme Assets
 ```
 
@@ -71,6 +64,33 @@ We have implemented **5 distinct environments** that go beyond simple CSS colors
 5. **Brick**: Classic urban wall textures.
 
 Every theme injects specific CSS variables (`--cal-primary`, `--cal-paper`, `--cal-border`) into the document root for a zero-flash transition.
+
+---
+
+## 🎨 Frontend Design System
+
+The application utilizes a sophisticated design system that blends classic layout principles with modern CSS-in-JS techniques.
+
+### 🌓 Automated Theme Synchronization
+The theme engine doesn't just change a single color—it re-skins the entire "room."
+- **Variable Injection**: The `useCalendarTheme` hook monitors the calendar's active date. When the month changes, it identifies the correct seasonal theme and injects a set of predefined CSS variables (`--cal-primary`, `--cal-paper`, `--cal-bg`, etc.) directly into the `:root` pseudo-class.
+- **Zero-Flash Transitions**: By using standard CSS variables, all components (Grid, Modals, Buttons) update instantly without a single line of component-level logic changes, ensuring high performance.
+
+### 🖼️ Procedural Scenery Logic (`WallWindow`)
+The "view" outside the window is built entirely with CSS primitives to avoid heavy image assets while maintaining a sharp, premium look:
+1. **Terrain Synthesis**: Each season uses a unique `clip-path` polygon. 
+   - We define a `TERRAIN_PATHS` constant mapping types like `drifts`, `hills`, and `cliffs` to complex polygon points.
+   - For every landscape, we render **two layered terrains** (Back and Front) with different opacities and vertical positions to create a 2.5D depth effect.
+2. **Celestial Rendering**: 
+   - A single celestial `div` is styled using **Radial Gradients**.
+   - **Sun Mode**: Uses warm gradients with a large spread `box-shadow` for intense bloom.
+   - **Moon Mode**: Utilizes a silver-centric gradient and a `blur(1px)` halo overlay to simulate a cold, diffused nighttime atmosphere.
+
+### 🌫️ Modern Aesthetics
+- **Glassmorphism**: Navigation headers and modal backdrops use `backdrop-blur-xl` combined with high-transparency white overlays (`white/10`) to create a frosted-glass effect that lets background themes peek through.
+- **Micro-Animations**: 
+  - **The Jiggle**: Triggered by the "Breeze" effect, the calendar card uses a synchronous `framer-motion` sequence that rotates it slightly around its "top-center" anchor point.
+  - **The Flip**: Navigating months triggers a 3D `rotateX` flip variants, simulating a physical page turn.
 
 ---
 

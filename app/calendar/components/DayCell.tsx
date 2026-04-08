@@ -32,33 +32,47 @@ const DayCell = ({
   // Filter and sort for consistent "lanes" across cells
   const dayEvents = calendarData
     .filter(item => {
-        if (item.type !== 'event') return false;
-        const d = new Date(date);
-        d.setHours(0,0,0,0);
-        const s = new Date(item.startDate);
-        s.setHours(0,0,0,0);
-        if (!item.endDate) return d.getTime() === s.getTime();
-        const e = new Date(item.endDate);
-        e.setHours(0,0,0,0);
-        return d >= s && d <= e;
+      if (item.type !== 'event') return false;
+      const d = new Date(date);
+      d.setHours(0, 0, 0, 0);
+      const s = new Date(item.startDate);
+      s.setHours(0, 0, 0, 0);
+      if (!item.endDate) return d.getTime() === s.getTime();
+      const e = new Date(item.endDate);
+      e.setHours(0, 0, 0, 0);
+      return d >= s && d <= e;
     })
     .sort((a, b) => (a.id || a.key).localeCompare(b.id || b.key));
 
+  const lastClickRef = React.useRef<number>(0);
+
+  const handleClick = () => {
+    const now = Date.now();
+    onSelect(date); // Always select on first/any click
+
+    if (now - lastClickRef.current < 300) {
+      onDoubleClick?.(date); // Trigger view modal on double tap
+      lastClickRef.current = 0;
+    } else {
+      lastClickRef.current = now;
+    }
+  };
+
   return (
     <div
-      className="relative flex h-12 sm:h-16 w-full cursor-pointer flex-col py-1 transition-all duration-150 select-none border-[0.5px]"
+      className="relative flex h-11 sm:h-13 w-full cursor-pointer flex-col py-1 transition-all duration-150 select-none border-[0.5px]"
       style={{
         opacity: !isCurrentMonth ? 0.25 : 1,
         background: isBetween
           ? 'var(--cal-primary)15'
           : isPreview
-          ? 'var(--cal-primary)10'
-          : 'transparent',
+            ? 'var(--cal-primary)10'
+            : 'transparent',
         borderColor: 'var(--cal-border)',
         minWidth: 0,
+        touchAction: 'manipulation'
       }}
-      onClick={() => onSelect(date)}
-      onDoubleClick={() => onDoubleClick?.(date)}
+      onClick={handleClick}
       onMouseEnter={() => onHover(date)}
     >
       {/* Date header line */}
@@ -69,8 +83,8 @@ const DayCell = ({
             today && !isActive && 'bg-[var(--cal-primary)] text-white',
             isActive && 'bg-[var(--cal-primary)] text-white'
           )}
-          style={{ 
-            color: (isActive || (today && !isActive)) ? '#fff' : paperText || 'inherit' 
+          style={{
+            color: (isActive || (today && !isActive)) ? '#fff' : paperText || 'inherit'
           }}
         >
           {format(date, 'd')}
@@ -93,7 +107,7 @@ const DayCell = ({
                 isStart ? "rounded-l-md ml-0.5 pl-1.5" : "-ml-[1px]",
                 isEnd ? "rounded-r-md mr-0.5" : "-mr-[1px]"
               )}
-              style={{ 
+              style={{
                 background: 'var(--cal-primary)',
                 opacity: 0.95
               }}
@@ -109,17 +123,17 @@ const DayCell = ({
           );
         })}
         {dayEvents.length > 3 && (
-            <div className="text-[7px] sm:text-[8px] font-black opacity-40 px-1.5">
-                + {dayEvents.length - 3} MORE
-            </div>
+          <div className="text-[7px] sm:text-[8px] font-black opacity-40 px-1.5">
+            + {dayEvents.length - 3} MORE
+          </div>
         )}
       </div>
 
       {/* Active selection markers */}
       {isActive && (
         <motion.div
-            layoutId={isStart ? 'range-start' : isEnd ? 'range-end' : undefined}
-            className="absolute inset-0 border-2 border-[var(--cal-primary)] pointer-events-none rounded-sm z-[2]"
+          layoutId={isStart ? 'range-start' : isEnd ? 'range-end' : undefined}
+          className="absolute inset-0 border-2 border-[var(--cal-primary)] pointer-events-none rounded-sm z-[2]"
         />
       )}
     </div>

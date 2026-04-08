@@ -87,7 +87,7 @@ export default function NotesModal({ isOpen, onClose, range }: NotesModalProps) 
     setTimeout(() => {
       setIsSaved(false);
       onClose();
-    }, 1000);
+    }, 200);
   };
 
   const handleDelete = (itemId: string) => {
